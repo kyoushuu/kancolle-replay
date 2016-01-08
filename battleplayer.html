@@ -54,6 +54,42 @@
 			xhr.open('GET',url);
 			xhr.send();
 		}
+		function parseURLParams(url) {
+			var queryStart = url.indexOf("?") + 1;
+			var queryEnd   = url.indexOf("#") + 1 || url.length + 1;
+			var query = url.slice(queryStart, queryEnd - 1);
+			var pairs = query.replace(/\+/g, " ").split("&");
+			var parms = {};
+			var i, n, v, nv;
+
+			if (query === url || query === "") {
+				return;
+			}
+
+			for (i = 0; i < pairs.length; i++) {
+				nv = pairs[i].split("=");
+				n = decodeURIComponent(nv[0]);
+				v = decodeURIComponent(nv[1]);
+
+				if (!parms.hasOwnProperty(n)) {
+					parms[n] = [];
+				}
+
+				parms[n].push(nv.length === 2 ? v : null);
+			}
+			return parms;
+		}
+		function checkFormData() {
+			if (location.toString().indexOf("?") <= 0) {
+				return;
+			}
+
+			var params = parseURLParams(location.toString());
+
+			if (params["url"] && params["url"][0]) {
+				loadImgURL(params["url"][0]);
+			}
+		}
 		</script>
 		<style>
 			.infotable {
@@ -71,7 +107,7 @@
 			}
 		</style>
 	</head>
-	<body>
+	<body onload="checkFormData();">
 		<span style="font-size:24px;font-weight:bold">KanColle Battle Replayer</span> <span style="color:red;margin-left:20px">v1.0 Beta 2.0 <span style="margin-left:20px;font-style:italic">(Last update: 2016-01-06)</span></span>
 		<br><br>
 		<div>
